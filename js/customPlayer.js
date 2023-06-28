@@ -152,9 +152,6 @@ class customPlayer extends Player {
             case "circle":
                ctx.ellipse(cmd.x * scale, cmd.y * scale, cmd.r * scale, cmd.r * scale, 0, 0, 2 * Math.PI);
                break;
-            case "stroke":
-               ctx.stroke();
-               break;
             case "fill":
                ctx.fill();
                break;
@@ -201,7 +198,13 @@ class customPlayer extends Player {
             ctx.beginPath();
             ctx.rect(od.minx * scale, od.miny * scale, bw * scale, bh * scale);
             ctx.stroke();
+
+            ctx.fillStyle = "Red";
+            ctx.beginPath();
+            ctx.arc((od.maxx + od.minx)*scale/2 , (od.maxy + od.miny)*scale/2 , 3, 0, 2 * Math.PI);
+            ctx.fill();
             //繪製物件類別
+            ctx.strokeStyle = "SpringGreen";
             ctx.beginPath();
             ctx.fillStyle = "SpringGreen";
             ctx.fillText(labelName + " Score:" + (od.score.toFixed(2)), od.minx * scale, (od.miny - 5) * scale);
@@ -266,10 +269,10 @@ class customPlayer extends Player {
                continue;
             }
 
+            esp32Control.changeTarget(od);
             esp32Control.cameraTrace(this.canvas);
             // console.log("追蹤目標");
-            esp32Control.changeTarget(od);
-         
+
          }
       }
    }
@@ -562,8 +565,8 @@ class CameraView extends WebSocket {
                //改變模式
                this.videoPlayer.mode = "object_detection";
                this.stopModel(["yolo4t", "retinaface", "mobilenetface", "yamnet"]);
-               // this.startModel(["yolo4t"]);
-               this.startModel(["yolo4t", "object_tracking"]);
+               this.startModel(["yolo4t"]);
+               // this.startModel(["yolo4t", "object_tracking"]);
                break;
 
             case "Audio Detection":
@@ -939,19 +942,19 @@ class esp32Servo extends WebSocket {
       super(url);
       this.verValue = 1484;//垂直 Servo pwm值
       this.horValue = 1484;//水平 Servo pwm值
-      this.basePwm = 4; // 基礎旋轉
+      this.basePwm = 3; // 基礎旋轉
       this.proportion = [0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0] //(目標位置-畫面中心)/畫面寬度 所佔用的畫面比例
       this.powerX = [50, 40, 30, 20, 15, 10, 3] //當超過畫面比例時 要乘以的垂直 Servo power
       this.powerY = [50, 40, 30, 20, 15, 10, 3] //當超過畫面比例時 要乘以的水平 Servo power
-      this.ignoreDeviationRatio = 0.005; //在一定的畫面 pixel中 停止轉動
-      
+      this.ignoreDeviationRatio = 0.04; //在一定的畫面 pixel中 停止轉動
+
       this.kp = 0.8;
       this.lastKi = 0;
       this.ki = 0.1;
       this.lastDx = 0;
       this.kd = 0.5;
       this.deltaTime = 0.2;
-      
+
       this.curTarget = { //當前目標的物件
          minx: 0,
          maxx: 0,
@@ -1014,7 +1017,8 @@ class esp32Servo extends WebSocket {
     */
    sendRotateJson(value_v, value_h) {
       console.log(`%c傳送的pwm: 水平:${value_h} , 垂直:${value_v}`, "font-size: 20px;");
-      let jsonToSend = this.createJson("rotate", "pwm", value_v, value_h);
+      // let jsonToSend = this.createJson("rotate", "pwm", value_v, value_h);
+      let jsonToSend = this.createJson("rotate", "pwm", 1484, value_h);
       //傳送pwm給Esp32
       this.send(jsonToSend);
       this.pwmRotateComplete = false;
@@ -1038,7 +1042,6 @@ class esp32Servo extends WebSocket {
    cameraTrace(canvas) {
       let cx = canvas.width / 2;
       let cy = canvas.height / 2;
-      console.log(`畫面中心: cx:${cx} , cy:${cy}`);
 
       let dx = this.curTarget.cx - cx;// dx > 0 目標在右邊
       let dy = this.curTarget.cy - cy;// dx < 0 目標在左邊
@@ -1053,17 +1056,18 @@ class esp32Servo extends WebSocket {
       //    return;
       // }
       // 水平Servo only
+      console.log(`%c ${Math.abs(dx)} , ${canvas.width} ,  ${canvas.width * this.ignoreDeviationRatio} ` , "font-size: 20px; color: #fff; background: #de1f18;")
       if (Math.abs(dx) < canvas.width * this.ignoreDeviationRatio) {
          console.log(`%c>>小於誤差值 停止移動<<${Math.abs(dx)}`, "font-size: 20px; color: #fff; background: #de1f18;")
          return;
       }
 
       //計算速度1
-      let vx = Math.abs(this.kp * dx + this.ki * (dx * this.deltaTime + this.lastKi) + this.kd * (dx - this.lastDx)*this.deltaTime );
+      let vx = Math.abs(this.kp * dx + this.ki * (dx * this.deltaTime + this.lastKi) + this.kd * (dx - this.lastDx) * this.deltaTime);
       this.lastKi = this.ki * (dx * this.deltaTime + this.lastKi);
       this.lastDx = dx;
       let vy = Math.abs(dy)
-      console.log(`%c P : ${this.kp * dx + this.ki} , I: ${this.ki * (dx * this.deltaTime + this.lastKi)} , D: ${this.kd * (dx - this.lastDx)*this.deltaTime }`,"font-size: 20px; color: #fff; background: #de1f18;" );
+      console.log(`%c P : ${this.kp * dx + this.ki} , I: ${this.ki * (dx * this.deltaTime + this.lastKi)} , D: ${this.kd * (dx - this.lastDx) * this.deltaTime}`, "font-size: 20px; color: #fff; background: #de1f18;");
       //計算速度2 最終速度為 min(速度1,速度2);      
       for (let i = 0; i < this.proportion.length; i++) {
          if (Math.abs(dx) / canvas.width > this.proportion[i]) {
