@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="GoogleChrome">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+   <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+   <script type="text/javascript" src="./js/fontawesome_kit_5.0.js"></script>
+   <script type="text/javascript" src="/js/bootstrap-5.3.0.bundle.min.js"></script>
+   <link rel="stylesheet" href="/css/bootstrap-5.3.0.min.css">
+   <link rel="stylesheet" href="./css/style.css">
+   <title>Websocket Test</title>
+</head>
+
+<body>
+   <!-- Header -->
+   <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+      <a href="" class="ps-3 d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+         <img src="/img/Drone100.png" alt="Logo" width="108" height="30" class="d-inline-block align-text-top">
+         <span class="ps-3 fs-4">Hub8735</span>
+      </a>
+      <ul class="nav nav-pills">
+         <li class="nav-item"><a href="./home.html" class="nav-link" aria-current="page">Home</a></li>
+         <li class="nav-item"><a href="" class="nav-link active">SingleTracking</a></li>
+         <li class="nav-item"><a href="" class="nav-link">MultiTracking</a></li>
+         <li class="nav-item"><a href="" class="nav-link" data-bs-toggle="modal" data-bs-target="#Modal_About" >About</a></li>
+      </ul>
+   </header>
+   <!-- Content -->
+   <div class="content justify-content-center">
+      <div class="col-10 pb-5" id="mainDiv">
+         <canvas id="obj_canvas0" class="tracking_Canvas"></canvas>
+         <canvas hidden id="mainView"></canvas>
+      </div>
+   </div>
+   <!-- Footer -->
+   <div class="container">
+      <footer class="d-flex flex-wrap justify-content-between align-items-center py-3  border-top">
+         <!-- Comapny CopyRight -->
+         <div class="col-md-4 d-flex align-items-center">
+            <span class="ps-3 mb-md-0" id="footer_content">© 2019 TD100 Company Limited by
+               Shares.</span>
+         </div>
+         <!-- Icon Links -->
+         <ul class="nav pe-3 col-md-4 justify-content-end list-unstyled d-flex">
+            <li class="ms-3"><a class="text-body-secondary" href="https://taiwandrone100.com/" target="_blank"><i
+                     class="fa-solid fa-globe" style="line-height: 1;"></i></a></li>
+            <li class="ms-3"><a class="text-body-secondary" href="https://youtube.com/@TaiwanDrone100" target="_blank"><i
+                     class="fab fa-youtube" style="line-height: 1; color: rgb(255, 0, 0);"></i></a></li>
+            <li class="ms-3"><a class="text-body-secondary" href="https://www.instagram.com/taiwandrone100/" target="_blank"><i
+                     class="fa-brands fa-instagram" style="line-height: 1; color: rgb(221, 52, 111);"></i></a></li>
+            <li class="ms-3"><a class="text-body-secondary" href="https://www.facebook.com/TaiwanDrone100" target="_blank"><i
+                     class="fa-brands fa-facebook" style="line-height: 1; color:rgb(16, 146, 241);"></i></a></li>
+         </ul>
+      </footer>
+   </div>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="Modal_About" tabindex="-1" aria-labelledby="Modal_About_Label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+          <div class="modal-header ">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">About</h1>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            本網頁可以控制hub8735進行物件辨識，<br>使用Websocket與裝置進行通訊，<br>並且可以使用伺服馬達進行追縱。<br>本畫面為hub8735的鏡頭畫面
+          </div>
+        </div>
+      </div>
+    </div>
+
+   <script type="text/javascript" src="/js/cusMenu.js"></script>
+   <script type="text/javascript" src="/js/decoder.js"></script>
+   <script type="text/javascript" src="/js/yuv_canvas.js"></script>
+   <script type="text/javascript" src="/js/player.js"></script>
+   <script type="text/javascript" src="./js/customPlayer.js"></script>
+</body>
+
+</html>

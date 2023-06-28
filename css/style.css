@@ -1,0 +1,95 @@
+:root {
+   /* 顏色設定 */
+   --dark-grey: #181818;
+   --light-white: #EFEFEF;
+   --font-color: #EFEFEF;
+   --bg-color: linear-gradient(30deg, #137ae1, #01050e);
+   --el-color: #103985;
+   --menu-bg-color: #323860;
+   --disable-color: #a0a0a0;
+   --locking-color: #50ca2e;
+   --launch-color: #b92525;
+   --disable-color: #a0a0a0;
+   --canvas-color: linear-gradient(0deg, #181818, #414141);
+}
+
+* {
+   /* 字體設定 */
+   font-family: RocknRoll One;
+   font-size: 14px;
+   color: var(--font-color);
+   margin: 0;
+   border: 0;
+   padding: 0;
+}
+
+body {
+   background: var(--bg-color);
+   min-height: 100vh;
+}
+
+
+/* Track */
+::-webkit-scrollbar-track {
+   height: 0;
+   width: 0;
+   background:var(--dark-grey);
+}
+
+/* width */
+::-webkit-scrollbar {
+   width:5px;
+   height:5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+   background-image: linear-gradient(180deg, #d0368a 0%, #708ad4 99%);
+   box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+   border-radius: 100px;
+   height: 20px;
+}
+
+header {
+   background-color: #050c57
+}
+
+.content {
+   display: flex;
+   min-height: 75vh;
+   max-height: 100vh;
+}
+
+#mainDiv {
+   text-align: center;
+}
+
+canvas {
+   background: var(--canvas-color);
+}
+
+.mybtn {
+   display: inline-block;
+   width: 100%;
+   box-sizing: border-box;
+   font: var(--font-color);
+   /* border: 2px solid var(--dark-grey); */
+   /* background: var(--el-color); */
+}
+
+#footer_content {
+   font-size: 0.3rem;
+   text-align: center;
+   align-items: center;
+}
+
+a.text-body-secondary:link,
+a.text-body-secondary:visited,
+a.text-body-secondary:hover,
+a.text-body-secondary:active {
+   text-decoration: none;
+}
+
+.disable {
+   background: var(--disable-color);
+}
