@@ -269,7 +269,7 @@ class customPlayer extends Player {
                continue;
             }
 
-            esp32Control.changeTarget(od);
+            esp32Control.changeTarget(od);            
             esp32Control.cameraTrace(this.canvas);
             // console.log("追蹤目標");
 
@@ -284,7 +284,6 @@ class customPlayer extends Player {
       this.esp32Control = esp32control;
    }
 }
-
 /**
  * @param {Array} detection Array of Object
  * @returns 
@@ -1017,8 +1016,7 @@ class esp32Servo extends WebSocket {
     */
    sendRotateJson(value_v, value_h) {
       console.log(`%c傳送的pwm: 水平:${value_h} , 垂直:${value_v}`, "font-size: 20px;");
-      // let jsonToSend = this.createJson("rotate", "pwm", value_v, value_h);
-      let jsonToSend = this.createJson("rotate", "pwm", 1484, value_h);
+      let jsonToSend = this.createJson("rotate", "pwm", value_v, value_h);      
       //傳送pwm給Esp32
       this.send(jsonToSend);
       this.pwmRotateComplete = false;
@@ -1153,7 +1151,7 @@ const initialize = () => {
          }
       }
 
-   }, 1000);
+   }, 5000);
 }
 
 window.addEventListener("load", initialize)
