@@ -58,7 +58,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
   case WStype_DISCONNECTED:
     Serial.printf("[%u] Disconnected!\n", num);
     break;
-
+  //接收到websocket訊息
   case WStype_TEXT:
     Serial.printf("[%u] get Text: %s\n", num, payload);
     handleJson((const char *)payload, num);
@@ -75,7 +75,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     break;
   }
 }
-
+//對接收到的Json進行解析
 void handleJson(const char *jsonString, uint8_t num)
 {
   StaticJsonDocument<200> jsonDoc;
@@ -88,7 +88,7 @@ void handleJson(const char *jsonString, uint8_t num)
     Serial.println(error.c_str());
     return;
   }
-
+//解析內容 {type , info , value1 , value2}
   const char *type = jsonDoc["type"];
   const char *info = jsonDoc["info"];
   int value1 = jsonDoc["value1"];
@@ -99,6 +99,7 @@ void handleJson(const char *jsonString, uint8_t num)
     if (strcmp(type, "rotate") == 0)
     {
       Serial.println("Rotate command received");
+      //根據info的內容為pwm或者deg進行不同的函式
       if (strcmp(info, "pwm") == 0)
       {
         handlePwmRotate(value1, value2, num);
@@ -118,13 +119,13 @@ void handleJson(const char *jsonString, uint8_t num)
     Serial.println("Type field not found");
   }
 }
-
+//使用pwm值進行旋轉
 void handlePwmRotate(int value_v, int value_h, uint8_t num)
 {
   Serial.println("handlePwmRotate");
 
-  value_v = constrain(value_v, 566, 2383);
-  value_h = constrain(value_h, 566, 2383);
+  value_v = constrain(value_v, 566, 2383);//可以更改，依據servo的不同
+  value_h = constrain(value_h, 566, 2383);//可以更改，依據servo的不同
 
   verticalServo.writeMicroseconds(value_v);
   horizontalServo.writeMicroseconds(value_h);
@@ -132,9 +133,10 @@ void handlePwmRotate(int value_v, int value_h, uint8_t num)
   delay(100);
   curPwm_v = verticalServo.readMicroseconds();
   curPwm_h = horizontalServo.readMicroseconds();
+  //回傳完成的字串後會將customPlayer.js中的pwmRotateComplete設定為true以此進行下一次旋轉
   webSocket.sendTXT(num, "pwm_Completed");
 }
-
+//使用角度進行旋轉
 void handleDegRotate(int value_v, int value_h, uint8_t num)
 {
   // webSocket.sendTXT(num, "handleDegRotate");
@@ -150,7 +152,7 @@ void handleDegRotate(int value_v, int value_h, uint8_t num)
 
   curPwm_v = verticalServo.readMicroseconds();
   curPwm_h = horizontalServo.readMicroseconds();
-
+  //回傳完成的字串後會將customPlayer.js中的degRotateComplete設定為true以此進行下一次旋轉
   webSocket.sendTXT(num, "deg_Completed");
 }
 
@@ -175,8 +177,8 @@ void setup()
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
 
-  curPwm_v = 1484;
-  curPwm_h = 1484;
+  curPwm_v = 1484;//可以更改，依據servo的不同
+  curPwm_h = 1484;//可以更改，依據servo的不同
   
   verticalServo.writeMicroseconds(curPwm_v);
   horizontalServo.writeMicroseconds(curPwm_h);

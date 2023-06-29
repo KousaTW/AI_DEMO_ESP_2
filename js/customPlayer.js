@@ -170,7 +170,7 @@ class customPlayer extends Player {
     * @param {Number} scale 
     */
    drawObjectDetectionOSD(ctx, scale) {
-      let res = this.osd.result;
+      let res = this.osd.result;      
       if (res.status == "ok") {
          let detection = res.detection;
          // draw box
@@ -201,7 +201,7 @@ class customPlayer extends Player {
 
             ctx.fillStyle = "Red";
             ctx.beginPath();
-            ctx.arc((od.maxx + od.minx)*scale/2 , (od.maxy + od.miny)*scale/2 , 3, 0, 2 * Math.PI);
+            ctx.arc((od.maxx + od.minx) * scale / 2, (od.maxy + od.miny) * scale / 2, 3, 0, 2 * Math.PI);
             ctx.fill();
             //繪製物件類別
             ctx.strokeStyle = "SpringGreen";
@@ -269,7 +269,7 @@ class customPlayer extends Player {
                continue;
             }
 
-            esp32Control.changeTarget(od);            
+            esp32Control.changeTarget(od);
             esp32Control.cameraTrace(this.canvas);
             // console.log("追蹤目標");
 
@@ -427,7 +427,7 @@ const adjustRect = (union, output_canvas, tracking_canvas) => {
 
    return union;
 }
-
+//Single Tracking Multi Tracking 用來進行追蹤
 const moveCamera = (curRect, minx, miny, maxx, maxy) => {
    let steps = 12; // steps to target
    let accel = 0.12;
@@ -535,30 +535,31 @@ class CameraView extends WebSocket {
             this.Launch_Request();
          })
       }
-
+      //設定重置按鈕得功能
       if (this.reloadBtn != undefined) {
          this.reloadBtn.addEventListener("click", () => {
-            console.log("Reload");
-            this.Reload();
+            this.videoPlayer.esp32Control.resetTo90();
          })
       }
-
+      //設定向右轉的按鈕功能
       if (this.leftBtn != undefined) {
          this.leftBtn.addEventListener("click", () => {
             this.videoPlayer.esp32Control.turnLeft();
          })
       }
+      //設定向左轉的按鈕功能
       if (this.rightBtn != undefined) {
          this.rightBtn.addEventListener("click", () => {
             this.videoPlayer.esp32Control.turnRight();
          })
       }
 
-
+      //當這個Websocket開始時
       this.onopen = () => {
          console.log("連接上 Hub8735");
          this.getVersion();
          this.toggleStream($("#streamBtn"));
+         //根據不同功能啟用不同的hub8735的model
          switch (this.curFeature) {
             case "Object Detection":
                //改變模式
@@ -652,7 +653,7 @@ class CameraView extends WebSocket {
       this.onerror = (evt) => {
          // console.log("Connection Error");
       }
-
+      //如果當前的功能是 Single Tracking 調整不同的Canvas大小
       if (this.curFeature == "Single Tracking") {
          // 調整大小 
          setCanvasSize(document.getElementById("mainDiv"), document.getElementById("obj_canvas0"), 0.9)
@@ -813,7 +814,7 @@ class CameraView extends WebSocket {
          }
       }
    }
-
+   //開始直播
    startStream(btn) {
       if (btn != undefined) {
          btn.removeClass("btn-primary").addClass("btn-danger");
@@ -822,7 +823,7 @@ class CameraView extends WebSocket {
       this.send(JSON.stringify({ cmd: "start_stream" }));
       this.streaming = true;
    }
-
+   //暫停直播
    stopStream(btn) {
       if (btn != undefined) {
          btn.removeClass("btn-danger").addClass("btn-primary");
@@ -839,7 +840,7 @@ class CameraView extends WebSocket {
          this.stopStream(btn);
       }
    }
-
+   //向hub8735請求model的狀態
    getModelStatus(ready) {
       if (ready == undefined) {
          ready = null;
@@ -847,19 +848,19 @@ class CameraView extends WebSocket {
       this.getModelStatusReady = ready;
       this.send(JSON.stringify({ cmd: "get_model_status" }));
    }
-
+   //向hub8735請求啟用model
    startModel(models) {
       this.send(JSON.stringify({ cmd: "start_model", param: models }));
    }
-
+   //向hub8735請求關閉model
    stopModel(models) {
       this.send(JSON.stringify({ cmd: "stop_model", param: models }));
    }
-
+   //向hub8735取得版本
    getVersion() {
       this.send(JSON.stringify({ cmd: "get_version" }));
    }
-
+   //啟用 發射按鈕
    enableLaunch(btn) {
       if (btn != undefined) {
          btn.disabled = false;
@@ -867,7 +868,7 @@ class CameraView extends WebSocket {
          btn.html('吃芭樂');
       }
    }
-
+   //禁用 發射按鈕
    disableLaunch(btn) {
       if (btn != undefined) {
          btn.disabled = true;
@@ -877,32 +878,34 @@ class CameraView extends WebSocket {
    }
    //啟用或者禁用發射按鈕
    toggleLaunch(btn) {
-      // console.log("執行toggle Launch" , this.detecting)
+      //Class customPlayer 的函式 drawObjectDetectionOSD 中如果有物件的話，會將detecting設定為true
       if (this.detecting) {
          this.enableLaunch(btn);
       } else {
          this.disableLaunch(btn);
       }
    }
-
+   //開始追蹤
    startTracking(btn) {
       if (btn != undefined) {
          btn.removeClass("btn-primary").addClass("btn-danger");
          btn.html('停止追蹤');
       }
       this.tracking = true;
+      //this.videoPlayer.tracking = true; 才會在Class customPlayer 的函式 onRenderFrameComplete 進行 函式controlEsp 
       this.videoPlayer.tracking = true;
    }
-
+   //暫停追蹤
    stopTracking(btn) {
       if (btn != undefined) {
          btn.removeClass("btn-danger").addClass("btn-primary");
          btn.html('開始追蹤');
       }
       this.tracking = false;
+      //this.videoPlayer.tracking = false; 會停止進行在Class customPlayer 的函式 onRenderFrameComplete 進行 函式controlEsp 
       this.videoPlayer.tracking = false;
    }
-   //啟用或者禁用直播按鈕
+   //開始追蹤或者暫停追蹤
    toggleTracking(btn) {
       if (!this.tracking) {
          this.startTracking(btn);
@@ -910,8 +913,7 @@ class CameraView extends WebSocket {
          this.stopTracking(btn);
       }
    }
-
-
+   //發射功能(未完成)
    Launch_Request() {
       var url = 'http://192.168.1.100/rotate?deg=10';
       fetch(url)
@@ -939,22 +941,22 @@ class esp32Servo extends WebSocket {
     */
    constructor(url) {
       super(url);
-      this.verValue = 1484;//垂直 Servo pwm值
-      this.horValue = 1484;//水平 Servo pwm值
-      this.basePwm = 3; // 基礎旋轉
-      this.proportion = [0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0] //(目標位置-畫面中心)/畫面寬度 所佔用的畫面比例
-      this.powerX = [50, 40, 30, 20, 15, 10, 3] //當超過畫面比例時 要乘以的垂直 Servo power
-      this.powerY = [50, 40, 30, 20, 15, 10, 3] //當超過畫面比例時 要乘以的水平 Servo power
-      this.ignoreDeviationRatio = 0.04; //在一定的畫面 pixel中 停止轉動
-
-      this.kp = 0.8;
+      this.verValue = 1484;//垂直 Servo pwm值　可以更改，依據servo的不同
+      this.horValue = 1484;//水平 Servo pwm值　可以更改，依據servo的不同
+      this.basePwm = 3; // 基礎旋轉　可以更改
+      this.proportion = [0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0] //(目標位置-畫面中心)/畫面寬度 所佔用的畫面比例　可以更改
+      this.powerX = [50, 40, 30, 20, 15, 10, 3] //當超過畫面比例時 要乘以的垂直 Servo power　可以更改
+      this.powerY = [50, 40, 30, 20, 15, 10, 3] //當超過畫面比例時 要乘以的水平 Servo power　可以更改
+      this.ignoreDeviationRatio = 0.04; //在一定的畫面 pixel中 停止轉動　可以更改
+      //PID 算法 (速度1)
+      this.kp = 0.8; // 可以更改
       this.lastKi = 0;
-      this.ki = 0.1;
+      this.ki = 0.1;// 可以更改
       this.lastDx = 0;
-      this.kd = 0.5;
-      this.deltaTime = 0.2;
-
-      this.curTarget = { //當前目標的物件
+      this.kd = 0.5;// 可以更改
+      this.deltaTime = 0.2;// 可以更改
+      //當前目標的物件
+      this.curTarget = {
          minx: 0,
          maxx: 0,
          miny: 0,
@@ -962,7 +964,7 @@ class esp32Servo extends WebSocket {
          cx: 0,
          cy: 0
       }
-
+      //判斷旋轉是否完成，完成後才能進行下一次旋轉
       this.pwmRotateComplete = true;
       this.degRotateComplete = true;
 
@@ -977,7 +979,7 @@ class esp32Servo extends WebSocket {
       this.onerror = function (error) {
          console.error('ESP32連線出錯:', error);
       };
-
+      //收到ESP32的消息 將旋轉完成設為true 以此進行下一次旋轉
       this.onmessage = (event) => {
          console.log("收到ESP消息", event.data);
          if (event.data == "pwm_Completed") {
@@ -1010,15 +1012,16 @@ class esp32Servo extends WebSocket {
       return json;
    }
    /**
-    * 用來傳送PWM Rotate
+    * 實際用來傳送PWM Rotate JSON 給ESP32 CAM
     * @param {Number} value_v 垂直數值 pwm range(566 , 2383)
     * @param {Number} value_h 水平數值 pwm range(566 , 2383)
     */
    sendRotateJson(value_v, value_h) {
       console.log(`%c傳送的pwm: 水平:${value_h} , 垂直:${value_v}`, "font-size: 20px;");
-      let jsonToSend = this.createJson("rotate", "pwm", value_v, value_h);      
+      let jsonToSend = this.createJson("rotate", "pwm", value_v, value_h);
       //傳送pwm給Esp32
       this.send(jsonToSend);
+      //將 pwmRotateComplete 當ESP32 回傳訊息完成旋轉後 則會將 this.pwmRotateComplete變回 true 才能進行下一次旋轉 
       this.pwmRotateComplete = false;
    }
    /**
@@ -1034,7 +1037,7 @@ class esp32Servo extends WebSocket {
       this.curTarget.cy = (this.curTarget.miny + this.curTarget.maxy) / 2;
    }
    /**
-    * 追蹤目標的P算法 
+    * 追蹤目標的PD算法 
     * @param {HTMLCanvasElement} canvas 進行追蹤的畫面 會依據這個畫面的比例進行pwm計算
     */
    cameraTrace(canvas) {
@@ -1054,7 +1057,7 @@ class esp32Servo extends WebSocket {
       //    return;
       // }
       // 水平Servo only
-      console.log(`%c ${Math.abs(dx)} , ${canvas.width} ,  ${canvas.width * this.ignoreDeviationRatio} ` , "font-size: 20px; color: #fff; background: #de1f18;")
+      console.log(`%c ${Math.abs(dx)} , ${canvas.width} ,  ${canvas.width * this.ignoreDeviationRatio} `, "font-size: 20px; color: #fff; background: #de1f18;")
       if (Math.abs(dx) < canvas.width * this.ignoreDeviationRatio) {
          console.log(`%c>>小於誤差值 停止移動<<${Math.abs(dx)}`, "font-size: 20px; color: #fff; background: #de1f18;")
          return;
@@ -1102,8 +1105,8 @@ class esp32Servo extends WebSocket {
       if (!this.degRotateComplete)
          return console.log("馬達還沒完成旋轉");
       let jsonToSend = this.createJson("rotate", "deg", 90, 90);
-      this.horValue = 1484;
-      this.verValue = 1484;
+      this.horValue = 1484;//可以更改，依據servo的不同
+      this.verValue = 1484;//可以更改，依據servo的不同
       this.send(jsonToSend);
       this.degRotateComplete = false;
    }
@@ -1154,5 +1157,5 @@ const initialize = () => {
    }, 5000);
 }
 
+// 當網頁載入完成後執行 initialize()
 window.addEventListener("load", initialize)
-
