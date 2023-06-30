@@ -13,35 +13,14 @@ const char *password = "12345678";
 
 Servo verticalServo;
 Servo horizontalServo;
-int verticalPin = 12;
-int horizontalPin = 13;
+int verticalPin = 12; //可以更改
+int horizontalPin = 13; //可以更改
 int curPwm_v = 0;
 int curPwm_h = 0;
 int dPwm_v = 0;
 int dPwm_h = 0;
 
-int range[] = {200, 100, 50, 20, 10, 0};
-int power[] = {50, 30, 10, 4, 2, 1};
-
-WebSocketsServer webSocket = WebSocketsServer(81);
-
-// 取得正負值
-int sign(int value)
-{
-  if (value > 0)
-  {
-    return 1;
-  }
-  else if (value < 0)
-  {
-    return -1;
-  }
-  else
-  {
-    return 0;
-  }
-}
-
+WebSocketsServer webSocket = WebSocketsServer(81);//可以更改
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 {
 
@@ -142,8 +121,8 @@ void handleDegRotate(int value_v, int value_h, uint8_t num)
   // webSocket.sendTXT(num, "handleDegRotate");
   Serial.println("handleDegRotate");
 
-  value_v = constrain(value_v, 1, 177);
-  value_h = constrain(value_h, 1, 177);
+  value_v = constrain(value_v, 1, 177);//可以更改，依據servo的不同
+  value_h = constrain(value_h, 1, 177);//可以更改，依據servo的不同
 
   verticalServo.write(value_v);
   horizontalServo.write(value_h);

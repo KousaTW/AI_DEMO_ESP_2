@@ -11,10 +11,10 @@ class customPlayer extends Player {
       //取得context
       this.ctx = this.canvas.getContext('2d');
       // 與div大小的縮放比例
-      this.scaleModifier = 0.9;
+      this.scaleModifier = 0.9;//可以更改
       this.setSize();
       // 設定 物件繪製，發射目標 馬達追蹤
-      this.objFilter = ['car', 'person', 'truck'];
+      this.objFilter = ['car', 'person', 'truck'];//可以更改
       this.tracking = false;
       /**主要執行 當 decode()完成後 會執行 onPictureDecoded() -> renderFrame() -> onRenderFrameComplete() --↓
        *                               ↑----------------------------------------------------------------←
@@ -508,7 +508,7 @@ class CameraView extends WebSocket {
       this.getModelStatusReady = null;
       this.streaming = false; //是否在直播
       this.detecting = false; //是否有偵測到目標
-      this.tracking = false;
+      this.tracking = false; //是否有在馬達追蹤
       this.launchBtn = document.querySelector("#launchBtn") || undefined
       this.trackBtn = document.querySelector("#trackBtn") || undefined
       this.reloadBtn = document.querySelector("#reloadBtn") || undefined
